@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>الوليد للطباعة</title>
+  <style>
+    @font-face {
+      font-family: 'Cairo';
+      src: url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+    }
+    
+    body {
+      font-family: 'Cairo', Arial, sans-serif;
+      background: linear-gradient(to bottom, #f0f8ff, #dfefff);
+      margin: 0; 
+      padding: 0;
+      min-height: 100vh;
+      color: #333;
+    }
+    
+    .splash {
+      text-align: center;
+      padding: 100px 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .splash img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+    
+    .splash h1 {
+      font-size: 2.2em;
+      color: #0077aa;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .splash button {
+      background: #0077aa;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .splash button:hover {
+      background: #005588;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .hidden { 
+      display: none; 
+    }
+    
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .file-input-container {
+      margin: 25px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .file-input-container input[type="file"] {
+      margin: 15px 0;
+      padding: 10px;
+      border: 2px dashed #0077aa;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .file-input-container small {
+      color: #666;
+      font-size: 0.9em;
+    }
+    
+    #loadingIndicator {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.1em;
+      color: #0077aa;
+    }
+    
+    .progress-container {
+      width: 80%;
+      margin: 15px auto;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      border-radius: 5px;
+      background: #0077aa;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .list-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .list-container button {
+      background: #0077aa;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      margin: 8px 0;
+      width: 100%;
+      font-size: 1em;
+      text-align: right;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .list-container button:hover {
+      background: #005588;
+      transform: translateX(-5px);
+    }
+    
+    .empty-list-message {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+    
+    .error-message {
+      text-align: center;
+      color: #d9534f;
+      padding: 20px;
+      font-weight: bold;
+      position: relative;
+      padding-right: 30px;
+    }
+    
+    .close-btn {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    
+    #studentDetails {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-top: 20px;
+    }
+    
+    .back-btn {
+      background: #666 !important;
+      margin-bottom: 25px !important;
+      padding: 10px 20px !important;
+    }
+    
+    .back-btn:hover {
+      background: #444 !important;
+    }
+    
+    #studentName {
+      color: #0077aa;
+      font-size: 2em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #0077aa;
+      text-align: center;
+    }
+    
+    #studentTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      font-size: 1.1em;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    #studentTable th {
+      background-color: #0077aa;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+    
+    #studentTable td {
+      padding: 15px;
+      border-bottom: 1px solid #dddddd;
+      text-align: center;
+      font-size: 1.05em;
+    }
+    
+    #studentTable tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    #studentTable tr:hover {
+      background-color: #f1f9ff;
+    }
+    
+    .summary-row {
+      background-color: #e6ffe6 !important;
+      font-weight: bold;
+    }
+    
+    .result-row {
+      background-color: #fff9e6 !important;
+      font-weight: bold;
+    }
+    
+    .rank-row {
+      background-color: #ffe6e6 !important;
+      font-weight: bold;
+    }
+    
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .actions button {
+      margin: 5px;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      background-color: #00aaff;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .actions button:hover {
+      background-color: #0088cc;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,.1);
+      border-radius: 50%;
+      border-top-color: #0077aa;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+    
+    h2 {
+      color: #0077aa;
+      font-size: 1.8em;
+      margin: 25px 0 15px 0;
+      text-align: center;
+    }
+    
+    h3 {
+      color: #005588;
+      font-size: 1.5em;
+      margin: 20px 0 15px 0;
+      text-align: right;
+    }
+    
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .breadcrumb-item {
+      margin: 0 5px;
+      color: #0077aa;
+      cursor: pointer;
+    }
+    
+    .breadcrumb-item:hover {
+      text-decoration: underline;
+    }
+    
+    .breadcrumb-separator {
+      margin: 0 5px;
+      color: #666;
+    }
+    
+    /* تنسيقات رأس وتذييل الصفحة */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    .header-box {
+      width: 48%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      min-height: 60px;
+      background: #f9f9f9;
+    }
+    
+    .header-center {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .logo-container img {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .header-bottom {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      min-height: 40px;
+      background: #f9f9f9;
+    }
+    
+    .header-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #0077aa;
+    }
+    
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+    
+    .footer-box {
+      width: 48%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      min-height: 50px;
+      background: #f9f9f9;
+    }
+    
+    /* تنسيقات التعديل */
+    .editable {
+      border: 1px dashed #ccc;
+      padding: 2px;
+      min-width: 50px;
+      min-height: 20px;
+    }
+    
+    .editable:focus {
+      outline: none;
+      border-color: #0077aa;
+      background: #f0f8ff;
+    }
+    
+    .edit-actions {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .edit-actions button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    
+    .save-btn {
+      background: #28a745;
+      color: white;
+    }
+    
+    .cancel-btn {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .undo-btn {
+      background: #ffc107;
+      color: #212529;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .actions button {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      #studentTable {
+        font-size: 1em;
+      }
+      
+      #studentTable th, 
+      #studentTable td {
+        padding: 12px;
+      }
+      
+      .header-top, .page-footer {
+        flex-direction: column;
+      }
+      
+      .header-box, .footer-box {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .file-input-container input[type="file"] {
+        width: 95%;
+      }
+      
+      #studentName {
+        font-size: 1.6em;
+      }
+      
+      #studentTable th, 
+      #studentTable td {
+        padding: 10px;
+        font-size: 0.95em;
+      }
+      
+      .actions button {
+        padding: 10px 15px;
+        font-size: 0.9em;
+      }
+      
+      .logo-container img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+    
+    /* تنسيقات الطباعة */
+    @media print {
+      body {
+        background: none;
+        font-size: 12pt;
+      }
+      
+      .container {
+        padding: 0;
+        max-width: 100%;
+      }
+      
+      #studentDetails {
+        box-shadow: none;
+        padding: 0;
+      }
+      
+      #studentTable {
+        font-size: 12pt;
+        box-shadow: none;
+      }
+      
+      #studentTable th {
+        background-color: #0077aa !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .actions, .breadcrumb, .edit-actions {
+        display: none !important;
+      }
+      
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- شاشة البداية -->
+<div class="splash" id="splash">
+  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="شعار التطبيق"/>
+  <h1>أهلاً بك في تطبيق الوليد للطباعة</h1>
+  <button onclick="showMain()">بدء الاستخدام</button>
+</div>
+
+<!-- الشاشة الرئيسية -->
+<div class="container hidden" id="main">
+  <h2>نظام إدارة نتائج الطلاب</h2>
+  
+  <div class="file-input-container">
+    <label for="fileInput">اختر ملف/ملفات Excel تحتوي على بيانات الطلاب:</label>
+    <input type="file" id="fileInput" accept=".xls,.xlsx" multiple/>
+    <small>ملاحظة: يجب أن يحتوي الملف على أسماء الطلاب في العمود الثاني</small>
+  </div>
+  
+  <div id="loadingIndicator" class="hidden">
+    <span class="loading"></span> جاري معالجة الملف، الرجاء الانتظار...
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+  
+  <!-- قائمة الملفات -->
+  <div id="filesSection" class="hidden">
+    <h3>الملفات المرفوعة</h3>
+    <div class="list-container" id="filesList"></div>
+  </div>
+  
+  <!-- قائمة الشيتات -->
+  <div id="sheetsSection" class="hidden">
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="breadcrumb-item" onclick="backToFiles()">الملفات</span>
+      <span class="breadcrumb-separator">/</span>
+      <span id="currentFileName"></span>
+    </div>
+    <h3>الشيتات المتاحة</h3>
+    <div class="list-container" id="sheetsList"></div>
+  </div>
+  
+  <!-- قائمة الطلاب -->
+  <div id="studentsSection" class="hidden">
+    <div class="breadcrumb" id="studentsBreadcrumb">
+      <span class="breadcrumb-item" onclick="backToFiles()">الملفات</span>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-item" onclick="backToSheets()" id="studentsFileName"></span>
+      <span class="breadcrumb-separator">/</span>
+      <span id="currentSheetName"></span>
+    </div>
+    <h3>قائمة الطلاب</h3>
+    <div class="list-container" id="studentsList"></div>
+    <div class="actions">
+      <button onclick="exportAllStudentsAsSinglePDF()">
+        <span style="font-size: 1.2em;">📚</span> تصدير جميع الطلاب في ملف PDF واحد
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- شاشة تفاصيل الطالب -->
+<div class="container hidden" id="studentDetails">
+  <div class="breadcrumb" id="detailsBreadcrumb">
+    <span class="breadcrumb-item" onclick="backToFiles()">الملفات</span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item" onclick="backToSheets()" id="detailsFileName"></span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item" onclick="backToStudents()" id="detailsSheetName"></span>
+    <span class="breadcrumb-separator">/</span>
+    <span id="currentStudentName"></span>
+  </div>
+  
+  <!-- رأس الصفحة -->
+  <div class="page-header">
+    <div class="header-top">
+      <div class="header-box" contenteditable="true">
+        <div class="header-title">معلومات المدرسة</div>
+        <div>اسم المدرسة: الثانوية النموذجية</div>
+      </div>
+      
+      <div class="header-box" contenteditable="true">
+        <div class="header-title">بيانات الفصل</div>
+        <div>الصف: الأول الثانوي - الفصل: أ</div>
+      </div>
+    </div>
+    
+    <div class="header-center">
+      <div class="logo-container" onclick="changeLogo()">
+        <img id="schoolLogo" src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="شعار المدرسة"/>
+      </div>
+    </div>
+    
+    <div class="header-bottom" contenteditable="true">
+      <div class="header-title">ملاحظات عامة</div>
+      <div>يمكنك إضافة أي ملاحظات عامة هنا</div>
+    </div>
+  </div>
+  
+  <h2 id="studentName"></h2>
+  
+  <table id="studentTable"></table>
+  
+  <!-- تذييل الصفحة -->
+  <div class="page-footer">
+    <div class="footer-box" contenteditable="true">
+      <div class="header-title">ملاحظات خاصة</div>
+      <div>يمكنك إضافة ملاحظات خاصة هنا</div>
+    </div>
+    
+    <div class="footer-box" contenteditable="true">
+      <div class="header-title">توقيع المدير</div>
+      <div>.................................</div>
+    </div>
+  </div>
+  
+  <div class="edit-actions hidden" id="editActions">
+    <button class="save-btn" onclick="saveChanges()">حفظ التعديلات</button>
+    <button class="cancel-btn" onclick="cancelEditing()">إلغاء</button>
+    <button class="undo-btn" onclick="undoChanges()">تراجع</button>
+  </div>
+  
+  <div class="actions">
+    <button onclick="startEditing()">
+      <span style="font-size: 1.2em;">✏️</span> تعديل البيانات
+    </button>
+    <button onclick="downloadPDF()">
+      <span style="font-size: 1.2em;">📄</span> تصدير إلى PDF
+    </button>
+    <button onclick="printPage()">
+      <span style="font-size: 1.2em;">🖨️</span> طباعة مباشرة
+    </button>
+    <button onclick="backToStudents()">
+      <span style="font-size: 1.2em;">↩</span> العودة للقائمة
+    </button>
+  </div>
+</div>
+
+<!-- المكتبات المطلوبة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<!-- الكود الرئيسي للتطبيق -->
+<script>
+// متغيرات التطبيق
+let excelFiles = []; // تخزين كافة الملفات
+let currentFileIndex = -1;
+let currentSheetIndex = -1;
+let currentStudentIndex = -1;
+let editHistory = [];
+let currentHistoryIndex = -1;
+let isEditing = false;
+let originalData = null;
+
+// بنية بيانات الملف
+class ExcelFile {
+  constructor(name, data) {
+    this.name = name;
+    this.data = data;
+    this.sheets = [];
+  }
+}
+
+// بنية بيانات الشيت
+class ExcelSheet {
+  constructor(name, data) {
+    this.name = name;
+    this.data = data;
+    this.students = [];
+  }
+}
+
+// بنية بيانات الطالب
+class Student {
+  constructor(name, data) {
+    this.name = name;
+    this.data = data;
+    this.subjects = [];
+    this.total = '';
+    this.result = '';
+    this.rank = '';
+    this.headerLeft = 'معلومات المدرسة\nاسم المدرسة: الثانوية النموذجية';
+    this.headerRight = 'بيانات الفصل\nالصف: الأول الثانوي - الفصل: أ';
+    this.headerBottom = 'ملاحظات عامة\nيمكنك إضافة أي ملاحظات عامة هنا';
+    this.footerLeft = 'ملاحظات خاصة\nيمكنك إضافة ملاحظات خاصة هنا';
+    this.footerRight = 'توقيع المدير\n.................................'; 
+    this.logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135755.png';
+  }
+}
+
+// عرض الشاشة الرئيسية
+function showMain() {
+  document.getElementById('splash').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+}
+
+// معالجة اختيار ملفات Excel
+document.getElementById('fileInput').addEventListener('change', function (e) {
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+  
+  // التحقق من حجم الملفات
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const largeFiles = files.filter(file => file.size > maxSize);
+  
+  if (largeFiles.length > 0) {
+    showMessage('error', `بعض الملفات كبيرة جداً (الحد الأقصى 5MB): ${largeFiles.map(f => f.name).join(', ')}`);
+    return;
+  }
+  
+  // إظهار مؤشر التحميل
+  document.getElementById('loadingIndicator').classList.remove('hidden');
+  document.getElementById('fileInput').disabled = true;
+  
+  // إعداد شريط التقدم
+  const progressBar = document.getElementById('progressBar');
+  progressBar.style.width = '0%';
+  
+  // مسح البيانات القديمة
+  excelFiles = [];
+  
+  let processedFiles = 0;
+  const updateProgress = () => {
+    const progress = (processedFiles / files.length) * 100;
+    progressBar.style.width = `${progress}%`;
+  };
+  
+  const promises = files.map(file => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const excelFile = new ExcelFile(file.name, workbook);
+          
+          // استخراج أسماء الشيتات
+          workbook.SheetNames.forEach(sheetName => {
+            const sheetData = workbook.Sheets[sheetName];
+            excelFile.sheets.push(new ExcelSheet(sheetName, sheetData));
+          });
+          
+          excelFiles.push(excelFile);
+          processedFiles++;
+          updateProgress();
+          resolve();
+        } catch (error) {
+          reject(new Error(`حدث خطأ في قراءة الملف ${file.name}: ${error.message}`));
+        }
+      };
+      reader.onerror = () => reject(new Error(`حدث خطأ في قراءة الملف ${file.name}`));
+      reader.readAsArrayBuffer(file);
+    });
+  });
+  
+  Promise.all(promises)
+    .then(() => {
+      if (excelFiles.length === 0) {
+        showMessage('error', 'لم يتم العثور على ملفات صالحة');
+      } else {
+        showFilesList();
+      }
+    })
+    .catch(error => {
+      showMessage('error', error.message);
+      console.error('Error:', error);
+    })
+    .finally(() => {
+      document.getElementById('loadingIndicator').classList.add('hidden');
+      document.getElementById('fileInput').disabled = false;
+      document.getElementById('fileInput').value = ''; // إعادة تعيين حقل الاختيار
+    });
+});
+
+// عرض قائمة الملفات
+function showFilesList() {
+  const filesList = document.getElementById('filesList');
+  filesList.innerHTML = '';
+  
+  if (excelFiles.length === 0) {
+    filesList.innerHTML = '<p class="empty-list-message">لا توجد ملفات لعرضها</p>';
+    return;
+  }
+  
+  excelFiles.forEach((file, index) => {
+    const btn = document.createElement('button');
+    btn.textContent = file.name;
+    btn.onclick = () => showSheetsList(index);
+    filesList.appendChild(btn);
+  });
+  
+  document.getElementById('filesSection').classList.remove('hidden');
+  document.getElementById('sheetsSection').classList.add('hidden');
+  document.getElementById('studentsSection').classList.add('hidden');
+}
+
+// عرض قائمة الشيتات لملف معين
+function showSheetsList(fileIndex) {
+  currentFileIndex = fileIndex;
+  const file = excelFiles[fileIndex];
+  const sheetsList = document.getElementById('sheetsList');
+  sheetsList.innerHTML = '';
+  
+  if (file.sheets.length === 0) {
+    sheetsList.innerHTML = '<p class="empty-list-message">لا توجد شيتات في هذا الملف</p>';
+    return;
+  }
+  
+  file.sheets.forEach((sheet, index) => {
+    const btn = document.createElement('button');
+    btn.textContent = sheet.name;
+    btn.onclick = () => showStudentsList(fileIndex, index);
+    sheetsList.appendChild(btn);
+  });
+  
+  document.getElementById('currentFileName').textContent = file.name;
+  document.getElementById('filesSection').classList.add('hidden');
+  document.getElementById('sheetsSection').classList.remove('hidden');
+  document.getElementById('studentsSection').classList.add('hidden');
+}
+
+// عرض قائمة الطلاب لشيت معين
+function showStudentsList(fileIndex, sheetIndex) {
+  currentFileIndex = fileIndex;
+  currentSheetIndex = sheetIndex;
+  
+  const file = excelFiles[fileIndex];
+  const sheet = file.sheets[sheetIndex];
+  const studentsList = document.getElementById('studentsList');
+  studentsList.innerHTML = '';
+  
+  // إضافة حقل البحث
+  const searchContainer = document.createElement('div');
+  searchContainer.style.margin = '10px 0';
+  searchContainer.innerHTML = `
+    <input type="text" id="studentSearch" placeholder="ابحث عن طالب..." 
+           style="padding: 8px; width: 100%; border: 1px solid #ddd; border-radius: 5px;">
+  `;
+  studentsList.appendChild(searchContainer);
+  
+  document.getElementById('studentSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const buttons = studentsList.querySelectorAll('button:not(:first-child)');
+    
+    buttons.forEach(btn => {
+      const studentName = btn.textContent.toLowerCase();
+      btn.style.display = studentName.includes(searchTerm) ? 'block' : 'none';
+    });
+  });
+  
+  // معالجة بيانات الشيت لاستخراج الطلاب
+  if (sheet.students.length === 0) {
+    try {
+      const rows = XLSX.utils.sheet_to_json(sheet.data, { header: 1 });
+      
+      // تخطي الصفوف الفارغة
+      const validRows = rows.filter(row => row.length > 1 && row[1]);
+      
+      validRows.slice(1).forEach(row => {
+        const studentName = row[1].toString().trim();
+        if (studentName) {
+          const student = new Student(studentName, row);
+          
+          // استخراج المواد والدرجات (بدءًا من العمود 4)
+          for (let i = 3; i < row.length - 3; i += 3) {
+            if (rows[0][i]) {
+              student.subjects.push({
+                name: rows[0][i].toString().split('-')[0].trim() || `مادة ${i/3 + 1}`,
+                col1: row[i] || '---',
+                col2: row[i+1] || '---',
+                col3: row[i+2] || '---'
+              });
+            }
+          }
+          
+          // استخراج المجموع الكلي والنتيجة والترتيب (آخر 3 أعمدة)
+          student.total = row[row.length-3] || '---';
+          student.result = row[row.length-2] || '---';
+          student.rank = row[row.length-1] || '---';
+          
+          sheet.students.push(student);
+        }
+      });
+    } catch (error) {
+      showMessage('error', `حدث خطأ في معالجة الشيت: ${error.message}`);
+      console.error('Error processing sheet:', error);
+    }
+  }
+  
+  if (sheet.students.length === 0) {
+    studentsList.innerHTML = '<p class="empty-list-message">لا توجد بيانات طلاب في هذا الشيت</p>';
+  } else {
+    sheet.students.forEach((student, index) => {
+      const btn = document.createElement('button');
+      btn.textContent = student.name;
+      btn.onclick = () => showStudentDetails(fileIndex, sheetIndex, index);
+      studentsList.appendChild(btn);
+    });
+  }
+  
+  document.getElementById('studentsFileName').textContent = file.name;
+  document.getElementById('currentSheetName').textContent = sheet.name;
+  document.getElementById('filesSection').classList.add('hidden');
+  document.getElementById('sheetsSection').classList.add('hidden');
+  document.getElementById('studentsSection').classList.remove('hidden');
+}
+
+// عرض تفاصيل الطالب
+function showStudentDetails(fileIndex, sheetIndex, studentIndex) {
+  currentFileIndex = fileIndex;
+  currentSheetIndex = sheetIndex;
+  currentStudentIndex = studentIndex;
+  
+  const file = excelFiles[fileIndex];
+  const sheet = file.sheets[sheetIndex];
+  const student = sheet.students[studentIndex];
+  
+  document.getElementById('main').classList.add('hidden');
+  document.getElementById('studentDetails').classList.remove('hidden');
+  
+  // تحديث مسار التنقل
+  document.getElementById('detailsFileName').textContent = file.name;
+  document.getElementById('detailsSheetName').textContent = sheet.name;
+  document.getElementById('currentStudentName').textContent = student.name;
+  
+  document.getElementById('studentName').textContent = student.name;
+  
+  // تحديث رأس وتذييل الصفحة
+  const headerBoxes = document.querySelectorAll('.header-box');
+  headerBoxes[0].innerHTML = `<div class="header-title">معلومات المدرسة</div>${student.headerLeft}`;
+  headerBoxes[1].innerHTML = `<div class="header-title">بيانات الفصل</div>${student.headerRight}`;
+  
+  const headerBottom = document.querySelector('.header-bottom');
+  headerBottom.innerHTML = `<div class="header-title">ملاحظات عامة</div>${student.headerBottom}`;
+  
+  const footerBoxes = document.querySelectorAll('.footer-box');
+  footerBoxes[0].innerHTML = `<div class="header-title">ملاحظات خاصة</div>${student.footerLeft}`;
+  footerBoxes[1].innerHTML = `<div class="header-title">توقيع المدير</div>${student.footerRight}`;
+  
+  document.getElementById('schoolLogo').src = student.logoUrl;
+  
+  const table = document.getElementById('studentTable');
+  table.innerHTML = `
+    <tr>
+      <th width="30%">المادة</th>
+      <th width="23%">المحصلة الأولى</th>
+      <th width="23%">الفصل الأول</th>
+      <th width="24%">المجموع</th>
+    </tr>
+  `;
+  
+  // عرض جميع مواد الطالب
+  student.subjects.forEach(sub => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${sub.name || '---'}</td>
+      <td>${sub.col1 || '---'}</td>
+      <td>${sub.col2 || '---'}</td>
+      <td>${sub.col3 || '---'}</td>
+    `;
+    table.appendChild(tr);
+  });
+  
+  // إضافة صفوف المجموع الكلي والنتيجة والترتيب
+  const additionalData = [
+    { title: 'المجموع الكلي', value: student.total, className: 'summary-row' },
+    { title: 'النتيجة', value: student.result, className: 'result-row' },
+    { title: 'الترتيب', value: student.rank, className: 'rank-row' }
+  ];
+  
+  additionalData.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.className = item.className;
+    tr.innerHTML = `
+      <td colspan="2"><strong>${item.title}</strong></td>
+      <td colspan="2">${item.value}</td>
+    `;
+    table.appendChild(tr);
+  });
+  
+  // إخفاء أزرار التعديل
+  document.getElementById('editActions').classList.add('hidden');
+  isEditing = false;
+}
+
+// وظائف التنقل بين الشاشات
+function backToFiles() {
+  document.getElementById('studentDetails').classList.add('hidden');
+  document.getElementById('studentsSection').classList.add('hidden');
+  document.getElementById('sheetsSection').classList.add('hidden');
+  document.getElementById('filesSection').classList.remove('hidden');
+  document.getElementById('main').classList.remove('hidden');
+}
+
+function backToSheets() {
+  document.getElementById('studentDetails').classList.add('hidden');
+  document.getElementById('studentsSection').classList.add('hidden');
+  document.getElementById('sheetsSection').classList.remove('hidden');
+  document.getElementById('filesSection').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+}
+
+function backToStudents() {
+  document.getElementById('studentDetails').classList.add('hidden');
+  document.getElementById('studentsSection').classList.remove('hidden');
+  document.getElementById('sheetsSection').classList.add('hidden');
+  document.getElementById('filesSection').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+}
+
+// بدء التعديل
+function startEditing() {
+  if (isEditing) return;
+  
+  const file = excelFiles[currentFileIndex];
+  const sheet = file.sheets[currentSheetIndex];
+  const student = sheet.students[currentStudentIndex];
+  
+  // حفظ النسخة الأصلية للتراجع عنها
+  originalData = JSON.parse(JSON.stringify(student));
+  editHistory = [];
+  currentHistoryIndex = -1;
+  saveToHistory(student);
+  
+  // جعل الجدول قابل للتعديل
+  const table = document.getElementById('studentTable');
+  const cells = table.querySelectorAll('td');
+  
+  cells.forEach(cell => {
+    if (!cell.hasAttribute('colspan')) {
+      cell.contentEditable = true;
+      cell.classList.add('editable');
+    }
+  });
+  
+  // جعل مربعات الرأس والتذييل قابلة للتعديل
+  const editableElements = document.querySelectorAll('[contenteditable="true"]');
+  editableElements.forEach(el => {
+    el.contentEditable = true;
+    el.classList.add('editable');
+  });
+  
+  // إظهار أزرار التعديل
+  document.getElementById('editActions').classList.remove('hidden');
+  isEditing = true;
+}
+
+// حفظ التعديلات
+function saveChanges() {
+  if (!isEditing) return;
+  
+  const file = excelFiles[currentFileIndex];
+  const sheet = file.sheets[currentSheetIndex];
+  const student = sheet.students[currentStudentIndex];
+  
+  // حفظ التعديلات من الجدول
+  const table = document.getElementById('studentTable');
+  const rows = table.querySelectorAll('tr:not(:first-child)');
+  
+  rows.forEach((row, rowIndex) => {
+    const cells = row.querySelectorAll('td');
+    
+    if (rowIndex < student.subjects.length) {
+      // تعديل بيانات المواد
+      student.subjects[rowIndex].name = cells[0].textContent;
+      student.subjects[rowIndex].col1 = cells[1].textContent;
+      student.subjects[rowIndex].col2 = cells[2].textContent;
+      student.subjects[rowIndex].col3 = cells[3].textContent;
+    } else {
+      // تعديل البيانات الإضافية (المجموع، النتيجة، الترتيب)
+      const additionalIndex = rowIndex - student.subjects.length;
+      if (additionalIndex === 0) student.total = cells[3].textContent;
+      else if (additionalIndex === 1) student.result = cells[3].textContent;
+      else if (additionalIndex === 2) student.rank = cells[3].textContent;
+    }
+  });
+  
+  // حفظ التعديلات من الرأس والتذييل
+  const headerBoxes = document.querySelectorAll('.header-box');
+  student.headerLeft = headerBoxes[0].innerHTML.replace('<div class="header-title">معلومات المدرسة</div>', '').trim();
+  student.headerRight = headerBoxes[1].innerHTML.replace('<div class="header-title">بيانات الفصل</div>', '').trim();
+  
+  const headerBottom = document.querySelector('.header-bottom');
+  student.headerBottom = headerBottom.innerHTML.replace('<div class="header-title">ملاحظات عامة</div>', '').trim();
+  
+  const footerBoxes = document.querySelectorAll('.footer-box');
+  student.footerLeft = footerBoxes[0].innerHTML.replace('<div class="header-title">ملاحظات خاصة</div>', '').trim();
+  student.footerRight = footerBoxes[1].innerHTML.replace('<div class="header-title">توقيع المدير</div>', '').trim();
+  
+  // حفظ الشعار
+  student.logoUrl = document.getElementById('schoolLogo').src;
+  
+  // حفظ في السجل التاريخي
+  saveToHistory(student);
+  
+  // إيقاف وضع التعديل
+  cancelEditing();
+  
+  showMessage('success', 'تم حفظ التعديلات بنجاح');
+}
+
+// إلغاء التعديلات
+function cancelEditing() {
+  if (!isEditing) return;
+  
+  // إعادة البيانات الأصلية
+  if (originalData) {
+    const file = excelFiles[currentFileIndex];
+    const sheet = file.sheets[currentSheetIndex];
+    const student = sheet.students[currentStudentIndex];
+    
+    Object.assign(student, JSON.parse(JSON.stringify(originalData)));
+    showStudentDetails(currentFileIndex, currentSheetIndex, currentStudentIndex);
+  }
+  
+  // إخفاء أزرار التعديل
+  document.getElementById('editActions').classList.add('hidden');
+  isEditing = false;
+}
+
+// التراجع عن التعديل الأخير
+function undoChanges() {
+  if (!isEditing || currentHistoryIndex <= 0) return;
+  
+  currentHistoryIndex--;
+  const prevState = editHistory[currentHistoryIndex];
+  
+  const file = excelFiles[currentFileIndex];
+  const sheet = file.sheets[currentSheetIndex];
+  const student = sheet.students[currentStudentIndex];
+  
+  Object.assign(student, JSON.parse(JSON.stringify(prevState)));
+  showStudentDetails(currentFileIndex, currentSheetIndex, currentStudentIndex);
+  startEditing(); // إعادة فتح وضع التعديل
+}
+
+// حفظ في السجل التاريخي
+function saveToHistory(student) {
+  // إذا كنا في منتصف السجل، احذف كل ما بعده
+  if (currentHistoryIndex < editHistory.length - 1) {
+    editHistory = editHistory.slice(0, currentHistoryIndex + 1);
+  }
+  
+  // احفظ الحالة الحالية
+  editHistory.push(JSON.parse(JSON.stringify(student)));
+  currentHistoryIndex = editHistory.length - 1;
+}
+
+// تغيير الشعار
+function changeLogo() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = event => {
+      const logoUrl = event.target.result;
+      document.getElementById('schoolLogo').src = logoUrl;
+      
+      // حفظ الشعار في بيانات الطالب إذا كنا في وضع التعديل
+      if (isEditing) {
+        const file = excelFiles[currentFileIndex];
+        const sheet = file.sheets[currentSheetIndex];
+        const student = sheet.students[currentStudentIndex];
+        student.logoUrl = logoUrl;
+        saveToHistory(student);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  input.click();
+}
+
+// إنشاء ملف PDF لطالب واحد
+function downloadPDF() {
+  const file = excelFiles[currentFileIndex];
+  const sheet = file.sheets[currentSheetIndex];
+  const student = sheet.students[currentStudentIndex];
+  
+  // إنشاء محتوى PDF مخصص
+  const pdfContent = document.createElement('div');
+  pdfContent.style.padding = '20px';
+  pdfContent.style.fontFamily = "'Cairo', Arial, sans-serif";
+  
+  // اسم الطالب
+  const studentName = document.createElement('h2');
+  studentName.style.textAlign = 'center';
+  studentName.style.color = '#0077aa';
+  studentName.style.marginBottom = '20px';
+  studentName.textContent = student.name;
+  pdfContent.appendChild(studentName);
+  
+  // جدول النتائج
+  const pdfTable = document.createElement('table');
+  pdfTable.style.width = '100%';
+  pdfTable.style.borderCollapse = 'collapse';
+  pdfTable.style.marginBottom = '20px';
+  
+  // رأس الجدول
+  const tableHeader = document.createElement('tr');
+  tableHeader.innerHTML = `
+    <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المادة</th>
+    <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المحصلة الأولى</th>
+    <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">الفصل الأول</th>
+    <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المجموع</th>
+  `;
+  pdfTable.appendChild(tableHeader);
+  
+  // بيانات المواد
+  student.subjects.forEach(sub => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.name || '---'}</td>
+      <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col1 || '---'}</td>
+      <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col2 || '---'}</td>
+      <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col3 || '---'}</td>
+    `;
+    pdfTable.appendChild(tr);
+  });
+  
+  // البيانات الإضافية
+  const additionalData = [
+    { title: 'المجموع الكلي', value: student.total, className: 'summary-row' },
+    { title: 'النتيجة', value: student.result, className: 'result-row' },
+    { title: 'الترتيب', value: student.rank, className: 'rank-row' }
+  ];
+  
+  additionalData.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.style.backgroundColor = item.className === 'summary-row' ? '#e6ffe6' : 
+                              item.className === 'result-row' ? '#fff9e6' : '#ffe6e6';
+    tr.style.fontWeight = 'bold';
+    tr.innerHTML = `
+      <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: center;"><strong>${item.title}</strong></td>
+      <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: center;">${item.value}</td>
+    `;
+    pdfTable.appendChild(tr);
+  });
+  
+  pdfContent.appendChild(pdfTable);
+  
+  // إعداد خيارات PDF
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `${student.name}_نتيجة.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2,
+      useCORS: true,
+      letterRendering: true,
+      logging: true,
+      backgroundColor: '#FFFFFF'
+    },
+    jsPDF: { 
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait',
+      putOnlyUsedFonts: true
+    },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    enableLinks: true
+  };
+  
+  // إظهار رسالة تحميل
+  const loadingMessage = document.createElement('div');
+  loadingMessage.style.textAlign = 'center';
+  loadingMessage.style.padding = '50px';
+  loadingMessage.innerHTML = `
+    <h2>${student.name}</h2>
+    <p><span class="loading"></span> جاري تحضير ملف PDF...</p>
+  `;
+  document.body.appendChild(loadingMessage);
+  
+  // إنشاء PDF
+  html2pdf().set(opt).from(pdfContent).save()
+    .then(() => {
+      // إزالة رسالة التحميل
+      document.body.removeChild(loadingMessage);
+    })
+    .catch(err => {
+      console.error('Error generating PDF:', err);
+      document.body.removeChild(loadingMessage);
+      showMessage('error', 'حدث خطأ أثناء إنشاء ملف PDF: ' + err.message);
+    });
+}
+
+// تصدير جميع الطلاب في ملف PDF واحد
+function exportAllStudentsAsSinglePDF() {
+  const file = excelFiles[currentFileIndex];
+  const sheet = file.sheets[currentSheetIndex];
+  
+  if (sheet.students.length === 0) {
+    showMessage('error', 'لا توجد بيانات طلاب للتصدير');
+    return;
+  }
+  
+  showMessage('success', 'جاري تحضير ملف PDF يحتوي على جميع نتائج الطلاب...');
+  
+  // إنشاء محتوى PDF رئيسي
+  const mainPdfContent = document.createElement('div');
+  mainPdfContent.style.fontFamily = "'Cairo', Arial, sans-serif";
+  
+  // إضافة صفحة لكل طالب
+  sheet.students.forEach((student, index) => {
+    // صفحة الطالب
+    const studentPage = document.createElement('div');
+    studentPage.style.padding = '20px';
+    studentPage.style.pageBreakAfter = 'always';
+    
+    // اسم الطالب
+    const studentName = document.createElement('h2');
+    studentName.style.textAlign = 'center';
+    studentName.style.color = '#0077aa';
+    studentName.style.marginBottom = '20px';
+    studentName.textContent = student.name;
+    studentPage.appendChild(studentName);
+    
+    // جدول النتائج
+    const pdfTable = document.createElement('table');
+    pdfTable.style.width = '100%';
+    pdfTable.style.borderCollapse = 'collapse';
+    pdfTable.style.marginBottom = '20px';
+    
+    // رأس الجدول
+    const tableHeader = document.createElement('tr');
+    tableHeader.innerHTML = `
+      <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المادة</th>
+      <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المحصلة الأولى</th>
+      <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">الفصل الأول</th>
+      <th style="background-color: #0077aa; color: white; padding: 10px; text-align: center;">المجموع</th>
+    `;
+    pdfTable.appendChild(tableHeader);
+    
+    // بيانات المواد
+    student.subjects.forEach(sub => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.name || '---'}</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col1 || '---'}</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col2 || '---'}</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${sub.col3 || '---'}</td>
+      `;
+      pdfTable.appendChild(tr);
+    });
+    
+    // البيانات الإضافية
+    const additionalData = [
+      { title: 'المجموع الكلي', value: student.total, className: 'summary-row' },
+      { title: 'النتيجة', value: student.result, className: 'result-row' },
+      { title: 'الترتيب', value: student.rank, className: 'rank-row' }
+    ];
+    
+    additionalData.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.style.backgroundColor = item.className === 'summary-row' ? '#e6ffe6' : 
+                                item.className === 'result-row' ? '#fff9e6' : '#ffe6e6';
+      tr.style.fontWeight = 'bold';
+      tr.innerHTML = `
+        <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: center;"><strong>${item.title}</strong></td>
+        <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: center;">${item.value}</td>
+      `;
+      pdfTable.appendChild(tr);
+    });
+    
+    studentPage.appendChild(pdfTable);
+    
+    // إضافة الصفحة إلى المحتوى الرئيسي
+    mainPdfContent.appendChild(studentPage);
+  });
+  
+  // إعداد خيارات PDF
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `${sheet.name}_نتائج_الطلاب.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2,
+      useCORS: true,
+      letterRendering: true,
+      logging: true,
+      backgroundColor: '#FFFFFF'
+    },
+    jsPDF: { 
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait',
+      putOnlyUsedFonts: true
+    },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    enableLinks: true
+  };
+  
+  // إظهار رسالة تحميل
+  const loadingMessage = document.createElement('div');
+  loadingMessage.style.textAlign = 'center';
+  loadingMessage.style.padding = '50px';
+  loadingMessage.innerHTML = `
+    <h2>جاري تحضير ملف PDF لجميع الطلاب</h2>
+    <p><span class="loading"></span> الرجاء الانتظار...</p>
+  `;
+  document.body.appendChild(loadingMessage);
+  
+  // إنشاء PDF
+  html2pdf().set(opt).from(mainPdfContent).save()
+    .then(() => {
+      // إزالة رسالة التحميل
+      document.body.removeChild(loadingMessage);
+    })
+    .catch(err => {
+      console.error('Error generating PDF:', err);
+      document.body.removeChild(loadingMessage);
+      showMessage('error', 'حدث خطأ أثناء إنشاء ملف PDF: ' + err.message);
+    });
+}
+
+// طباعة الصفحة مباشرة
+function printPage() {
+  window.print();
+}
+
+// عرض رسائل للمستخدم
+function showMessage(type, message) {
+  const container = document.createElement('div');
+  container.className = type === 'error' ? 'error-message' : 'empty-list-message';
+  container.style.position = 'relative';
+  container.style.paddingRight = '30px';
+  
+  const closeBtn = document.createElement('span');
+  closeBtn.className = 'close-btn';
+  closeBtn.textContent = '×';
+  closeBtn.onclick = () => container.remove();
+  
+  container.appendChild(closeBtn);
+  container.appendChild(document.createTextNode(message));
+  
+  const mainContainer = document.getElementById('main');
+  mainContainer.insertBefore(container, mainContainer.firstChild);
+  
+  // إزالة تلقائية بعد 10 ثواني فقط للرسائل غير المهمة
+  if (type === 'error') {
+    setTimeout(() => {
+      if (document.body.contains(container)) {
+        container.remove();
+      }
+    }, 10000);
+  }
+}
+</script>
+</body>
+</html>
